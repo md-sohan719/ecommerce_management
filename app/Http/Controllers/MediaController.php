@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Serves uploaded thumbnails from storage/app/public.
- * (Avoids requiring `php artisan storage:link`, which needs symlink rights on Windows.)
+ * Fallback for uploaded thumbnails (storage/app/public) when the public/media
+ * link from `php artisan storage:link` is missing. With the link in place, the
+ * web server serves the files directly and this controller isn't reached.
  */
 class MediaController extends Controller
 {

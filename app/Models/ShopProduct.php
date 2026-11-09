@@ -83,6 +83,18 @@ class ShopProduct extends Model
         });
     }
 
+    /**
+     * Storefront sort options: latest (default), price_asc, price_desc.
+     */
+    public function scopeSortBy(Builder $query, ?string $sort): Builder
+    {
+        return match ($sort) {
+            'price_asc' => $query->orderBy('shop_products.price')->orderBy('shop_products.id'),
+            'price_desc' => $query->orderByDesc('shop_products.price')->orderBy('shop_products.id'),
+            default => $query->latest('shop_products.id'),
+        };
+    }
+
     public function effectiveName(): string
     {
         return $this->title ?: $this->product->name;

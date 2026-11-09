@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { api, errorMessage } from '../../lib/api';
 import { debounce } from '../../lib/format';
+import Icon from '../../components/Icon.vue';
 import ProductCard from '../../components/ProductCard.vue';
 import ProductFilters from '../../components/ProductFilters.vue';
 import Pagination from '../../components/Pagination.vue';
@@ -21,27 +22,43 @@ const search = ref('');
 const sort = ref('latest');
 const page = ref(1);
 
+function fetchProducts() {
+    return api.get(`/storefront/shops/${route.params.slug}/products`, {
+        params: { search: search.value || undefined, sort: sort.value, page: page.value, per_page: 12 },
+    });
+}
+
+// Shop details and its products are requested together and shown together.
+let visit = 0;
 async function loadShop() {
+    const id = ++visit;
     notFound.value = false;
+    error.value = '';
     shop.value = null;
+    products.value = [];
+    meta.value = null;
+    loading.value = true;
     try {
-        const { data } = await api.get(`/storefront/shops/${route.params.slug}`);
-        shop.value = data.data;
+        const [shopResponse, productsResponse] = await Promise.all([api.get(`/storefront/shops/${route.params.slug}`), fetchProducts()]);
+        if (id !== visit) return; // the visitor already moved on to another shop
+        shop.value = shopResponse.data.data;
+        products.value = productsResponse.data.data;
+        meta.value = productsResponse.data.meta;
         document.title = `${shop.value.name} · Small E-commerce`;
-        await loadProducts();
     } catch (e) {
+        if (id !== visit) return;
         if (e.response?.status === 404) notFound.value = true;
         else error.value = errorMessage(e);
-        loading.value = false;
+    } finally {
+        if (id === visit) loading.value = false;
     }
 }
 
+// Search, sort and pagination only reload the product list.
 async function loadProducts() {
     loading.value = true;
     try {
-        const { data } = await api.get(`/storefront/shops/${route.params.slug}/products`, {
-            params: { search: search.value || undefined, sort: sort.value, page: page.value, per_page: 12 },
-        });
+        const { data } = await fetchProducts();
         products.value = data.data;
         meta.value = data.meta;
     } catch (e) {
@@ -84,16 +101,26 @@ watch(
     <div v-else>
         <section class="border-b border-slate-200 bg-white">
             <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-                <RouterLink :to="{ name: 'home' }" class="text-sm text-slate-500 hover:text-indigo-600">← All shops</RouterLink>
-                <div v-if="shop" class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-3xl">🏪</span>
+                <nav class="flex items-center gap-2 text-sm text-slate-500">
+                    <RouterLink :to="{ name: 'home' }" class="hover:text-indigo-600">Home</RouterLink>
+                    <Icon name="chevron-right" class="h-3.5 w-3.5" />
+                    <RouterLink :to="{ name: 'home', hash: '#shops' }" class="hover:text-indigo-600">Shops</RouterLink>
+                    <template v-if="shop">
+                        <Icon name="chevron-right" class="h-3.5 w-3.5" />
+                        <span class="text-slate-700">{{ shop.name }}</span>
+                    </template>
+                </nav>
+                <div v-if="shop" class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-2xl font-bold text-white">
+                        {{ shop.name.charAt(0) }}
+                    </span>
                     <div>
                         <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">{{ shop.name }}</h1>
                         <p v-if="shop.description" class="mt-1 text-slate-600">{{ shop.description }}</p>
-                        <p class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
-                            <span v-if="shop.address">📍 {{ shop.address }}</span>
-                            <span v-if="shop.phone">📞 {{ shop.phone }}</span>
-                            <span>📦 {{ shop.products_count }} products</span>
+                        <p class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-500">
+                            <span v-if="shop.address" class="flex items-center gap-1.5"><Icon name="map-pin" class="h-4 w-4" />{{ shop.address }}</span>
+                            <span v-if="shop.phone" class="flex items-center gap-1.5"><Icon name="phone" class="h-4 w-4" />{{ shop.phone }}</span>
+                            <span class="flex items-center gap-1.5"><Icon name="cube" class="h-4 w-4" />{{ shop.products_count }} products</span>
                         </p>
                     </div>
                 </div>

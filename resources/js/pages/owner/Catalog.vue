@@ -10,6 +10,7 @@ import ListingForm from '../../components/ListingForm.vue';
 import Modal from '../../components/Modal.vue';
 import Pagination from '../../components/Pagination.vue';
 import ProductForm from '../../components/ProductForm.vue';
+import Icon from '../../components/Icon.vue';
 import Thumb from '../../components/Thumb.vue';
 
 const shop = computed(() => ownerShops.current);
@@ -131,7 +132,10 @@ async function removeProduct(product) {
             <article v-for="p in products" :key="p.id" class="card flex flex-col overflow-hidden">
                 <div class="relative">
                     <Thumb :src="p.thumbnail_url" :alt="p.name" class="aspect-[4/3] w-full" rounded="rounded-none" />
-                    <span v-if="p.is_listed" class="badge absolute top-2 left-2 bg-emerald-600 text-white shadow">✓ In your shop</span>
+                    <span v-if="p.is_listed" class="badge absolute top-2 left-2 bg-emerald-600 text-white shadow">
+                        <Icon name="check" class="h-3.5 w-3.5" />
+                        In your shop
+                    </span>
                 </div>
                 <div class="flex flex-1 flex-col p-4">
                     <p class="line-clamp-2 font-medium text-slate-900">{{ p.name }}</p>
@@ -164,7 +168,7 @@ async function removeProduct(product) {
 
         <div v-else class="card p-10 text-center text-slate-500">
             <template v-if="tab === 'mine'">You haven't created any products yet.</template>
-            <template v-else-if="tab === 'not_listed'">Your shop already has every catalog product. 🎉</template>
+            <template v-else-if="tab === 'not_listed'">Your shop already has every catalog product.</template>
             <template v-else>No products found.</template>
         </div>
 

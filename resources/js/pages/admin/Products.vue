@@ -82,7 +82,7 @@ async function remove(product) {
                             <td class="td">
                                 <span v-if="!product.creator" class="text-slate-400">Deleted user</span>
                                 <span v-else-if="product.creator.role === 'admin'" class="badge bg-indigo-50 text-indigo-700">Admin</span>
-                                <span v-else class="badge bg-violet-50 text-violet-700">🏪 {{ product.creator.name }}</span>
+                                <span v-else class="badge bg-violet-50 text-violet-700">Owner · {{ product.creator.name }}</span>
                             </td>
                             <td class="td font-medium">{{ money(product.base_price) }}</td>
                             <td class="td">

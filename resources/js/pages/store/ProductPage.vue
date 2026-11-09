@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { api, errorMessage } from '../../lib/api';
 import { money } from '../../lib/format';
+import Icon from '../../components/Icon.vue';
 import Thumb from '../../components/Thumb.vue';
 import NotFound from './NotFound.vue';
 
@@ -59,7 +60,8 @@ watch(() => [route.params.slug, route.params.id], ([slug, id]) => slug && id && 
 
                 <div>
                     <RouterLink :to="{ name: 'shop', params: { slug: product.shop.slug } }" class="badge bg-indigo-50 text-indigo-700 hover:bg-indigo-100">
-                        🏪 Sold by {{ product.shop.name }}
+                        <Icon name="store" class="h-3.5 w-3.5" />
+                        Sold by {{ product.shop.name }}
                     </RouterLink>
                     <h1 class="mt-3 text-2xl font-bold text-slate-900 sm:text-3xl">{{ product.name }}</h1>
                     <p class="mt-4 text-3xl font-bold text-indigo-700">{{ money(product.price) }}</p>

@@ -48,6 +48,40 @@ class StorefrontTest extends TestCase
         $this->getJson("/api/storefront/shops/{$inactive->slug}/products/{$inShopClosed->product_id}")->assertNotFound();
     }
 
+    public function test_home_page_data_only_uses_visible_products(): void
+    {
+        $big = Shop::factory()->create(['name' => 'Big shop']);
+        $small = Shop::factory()->create(['name' => 'Small shop']);
+        $closed = Shop::factory()->inactive()->create();
+        $empty = Shop::factory()->create(['name' => 'Empty shop']);
+
+        ShopProduct::factory()->create(['shop_id' => $big->id, 'price' => 100]);
+        ShopProduct::factory()->create(['shop_id' => $big->id, 'price' => 500, 'title' => 'Top item']);
+        ShopProduct::factory()->hidden()->create(['shop_id' => $big->id, 'price' => 9999]);
+        ShopProduct::factory()->create(['shop_id' => $small->id, 'price' => 50]);
+        ShopProduct::factory()->create(['shop_id' => $closed->id, 'price' => 700]);
+        ShopProduct::factory()->hidden()->create(['shop_id' => $empty->id]);
+
+        $this->getJson('/api/storefront/home')
+            ->assertOk()
+            // banner: shops with visible products, most products first, with their highest-priced visible product
+            ->assertJsonCount(2, 'featured')
+            ->assertJsonPath('featured.0.shop.name', 'Big shop')
+            ->assertJsonPath('featured.0.shop.products_count', 2)
+            ->assertJsonPath('featured.0.product.name', 'Top item')
+            ->assertJsonPath('featured.0.product.price', 500)
+            ->assertJsonPath('featured.1.shop.name', 'Small shop')
+            // all active shops, including the one without visible products
+            ->assertJsonCount(3, 'shops')
+            // first page of visible products, same format as /storefront/products
+            ->assertJsonCount(3, 'products.data')
+            ->assertJsonPath('products.meta.total', 3);
+
+        $this->getJson('/api/storefront/home?search=Top%20item')
+            ->assertJsonCount(1, 'products.data')
+            ->assertJsonPath('products.data.0.name', 'Top item');
+    }
+
     public function test_shop_specific_price_details_and_thumbnail_are_shown(): void
     {
         $product = Product::factory()->create([

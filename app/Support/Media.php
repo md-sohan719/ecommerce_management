@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Storage;
 /**
  * Small helper around the "public" disk for uploaded thumbnails.
  *
- * Files are served through the /media/{path} route, so the project works
- * without `php artisan storage:link` (symlinks are unreliable on Windows) and
- * URLs are relative, so they don't depend on APP_URL.
+ * Files are public at /media/{path}. `php artisan storage:link` links
+ * public/media to storage/app/public (config/filesystems.php), so the web
+ * server sends the files directly. Without the link, the /media route serves
+ * them through Laravel (slower, but it still works). URLs are relative, so
+ * they don't depend on APP_URL.
  */
 class Media
 {

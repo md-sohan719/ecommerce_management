@@ -8,6 +8,7 @@ import { useList } from '../../lib/useList';
 import ListingForm from '../../components/ListingForm.vue';
 import Modal from '../../components/Modal.vue';
 import Pagination from '../../components/Pagination.vue';
+import Icon from '../../components/Icon.vue';
 import Thumb from '../../components/Thumb.vue';
 
 const shop = computed(() => ownerShops.current);
@@ -81,8 +82,10 @@ function priceDiff(listing) {
     <div class="space-y-4">
         <!-- No shop assigned -->
         <div v-if="ownerShops.loaded && !shop" class="card p-10 text-center">
-            <p class="text-4xl">🏪</p>
-            <h2 class="mt-3 text-lg font-semibold text-slate-900">You don't have a shop yet</h2>
+            <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                <Icon name="store" class="h-7 w-7" />
+            </span>
+            <h2 class="mt-4 text-lg font-semibold text-slate-900">You don't have a shop yet</h2>
             <p class="mt-1 text-sm text-slate-600">Ask the administrator to assign a shop to your account. Meanwhile you can still add products to the shared catalog.</p>
             <RouterLink :to="{ name: 'owner.catalog' }" class="btn btn-primary mt-5">Browse the catalog</RouterLink>
         </div>
@@ -102,8 +105,14 @@ function priceDiff(listing) {
                     </p>
                 </div>
                 <div class="flex gap-2">
-                    <RouterLink v-if="shop.is_active" :to="{ name: 'shop', params: { slug: shop.slug } }" target="_blank" class="btn btn-secondary">View shop ↗</RouterLink>
-                    <RouterLink :to="{ name: 'owner.catalog' }" class="btn btn-primary">+ Add from catalog</RouterLink>
+                    <RouterLink v-if="shop.is_active" :to="{ name: 'shop', params: { slug: shop.slug } }" target="_blank" class="btn btn-secondary">
+                        <Icon name="external" class="h-4 w-4" />
+                        View shop
+                    </RouterLink>
+                    <RouterLink :to="{ name: 'owner.catalog' }" class="btn btn-primary">
+                        <Icon name="plus" class="h-4 w-4" />
+                        Add from catalog
+                    </RouterLink>
                 </div>
             </div>
 
@@ -156,7 +165,8 @@ function priceDiff(listing) {
                                         :title="l.is_active ? 'Click to hide from customers' : 'Click to show to customers'"
                                         @click="toggle(l)"
                                     >
-                                        {{ l.is_active ? '● Visible' : '○ Hidden' }}
+                                        <span class="h-1.5 w-1.5 rounded-full" :class="l.is_active ? 'bg-emerald-500' : 'bg-slate-400'" />
+                                        {{ l.is_active ? 'Visible' : 'Hidden' }}
                                     </button>
                                 </td>
                                 <td class="td">

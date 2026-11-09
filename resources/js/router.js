@@ -51,6 +51,13 @@ const router = createRouter({
     routes,
     scrollBehavior(to, from, saved) {
         if (saved) return saved;
+        // e.g. /#products — wait for the page to render, keep clear of the sticky header.
+        // If the section isn't rendered yet (page still loading), the page scrolls to it once its data is in.
+        if (to.hash) {
+            return new Promise((resolve) =>
+                setTimeout(() => resolve(document.getElementById(to.hash.slice(1)) ?{ el: to.hash, top: 130, behavior: 'smooth' } : { top: 0 }), 100),
+            );
+        }
         if (to.path !== from.path) return { top: 0 };
     },
 });

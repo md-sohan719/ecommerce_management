@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Owner\CatalogController;
 use App\Http\Controllers\Api\Owner\ListingController;
 use App\Http\Controllers\Api\Owner\ProductController as OwnerProductController;
 use App\Http\Controllers\Api\Owner\ShopController as OwnerShopController;
+use App\Http\Controllers\Api\Storefront\HomeController as StorefrontHomeController;
 use App\Http\Controllers\Api\Storefront\ProductController as StorefrontProductController;
 use App\Http\Controllers\Api\Storefront\ShopController as StorefrontShopController;
 use App\Models\User;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 | Only products assigned to an (active) shop are ever returned.
 */
 Route::prefix('storefront')->name('storefront.')->group(function () {
+    Route::get('home', StorefrontHomeController::class)->name('home');
     Route::get('shops', [StorefrontShopController::class, 'index'])->name('shops.index');
     Route::get('shops/{shop:slug}', [StorefrontShopController::class, 'show'])->name('shops.show');
     Route::get('shops/{shop:slug}/products', [StorefrontProductController::class, 'shopProducts'])->name('shops.products');

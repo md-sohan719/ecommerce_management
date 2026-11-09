@@ -83,9 +83,10 @@ DB_PASSWORD=
 
 ```bash
 php artisan migrate --seed
+php artisan storage:link
 ```
 
-This creates all tables and loads the demo data: users, shops, products, shop listings and generated product thumbnails.
+This creates all tables and loads the demo data: users, shops, products, shop listings and product photos (copied from `database/seeders/images`, credits in `CREDITS.md` there). `storage:link` links `public/media` to `storage/app/public`, so thumbnails are sent directly by the web server. On Windows it creates a directory junction, which needs no admin rights.
 
 ### 6. Install and build the frontend
 
@@ -102,11 +103,11 @@ php artisan serve
 
 Open **http://127.0.0.1:8000**.
 
-> **No `php artisan storage:link` is needed.** Uploaded thumbnails are served through the `/media/...` route, so the project also works on Windows without symlink permissions.
+> If you skip `storage:link`, thumbnails still work: Laravel serves them through the `/media/...` route, just more slowly.
 
 #### One-command alternative
 
-After you create the database (step 4), `composer setup` runs steps 2–6 in one go: install, `.env`, key, `migrate:fresh --seed`, `npm install` and build. Then run `php artisan serve`.
+After you create the database (step 4), `composer setup` runs steps 2–6 in one go: install, `.env`, key, `migrate:fresh --seed`, `storage:link`, `npm install` and build. Then run `php artisan serve`.
 
 #### Development mode (hot reload)
 
@@ -206,6 +207,7 @@ All endpoints are under `/api` and return JSON. Authenticated endpoints need `Au
 | ------ | -------- | ------ | ----------- |
 | POST | `/login` | public | Get an API token |
 | GET  | `/me`, POST `/logout` | auth | Current user / revoke the token |
+| GET  | `/storefront/home` | public | Home page data in one request: banner (top 3 shops with their highest-priced product), shops, first page of products |
 | GET  | `/storefront/shops` | public | Active shops |
 | GET  | `/storefront/shops/{slug}` | public | Shop details |
 | GET  | `/storefront/shops/{slug}/products` | public | Visible products of a shop (`search`, `sort`, `page`) |
@@ -246,8 +248,8 @@ app/
     AuthController.php
     Admin/       DashboardController, ShopController, ProductController, ShopOwnerController
     Owner/       ShopController, CatalogController, ProductController, ListingController
-    Storefront/  ShopController, ProductController
-  Http/Controllers/MediaController.php   serves uploaded thumbnails (/media/...)
+    Storefront/  HomeController, ShopController, ProductController
+  Http/Controllers/MediaController.php   serves /media/... thumbnails if storage:link was not run
   Http/Middleware/EnsureUserHasRole.php
   Http/Requests/   ShopRequest, ProductRequest, ListingRequest, ShopOwnerRequest
   Http/Resources/  User/Shop/Product/Listing/StorefrontProduct resources
@@ -257,8 +259,9 @@ app/
   Support/Media.php
 database/
   migrations/  factories/  seeders/DatabaseSeeder.php
+  seeders/images/        demo product photos (openly licensed, see CREDITS.md)
 resources/js/          Vue 3 SPA
-  router.js  lib/ (api, auth, ownerShops, useList, ...)
+  router.js  lib/ (api, auth, ownerShops, storefront, useList, ...)
   layouts/   StoreLayout, DashboardLayout
   pages/     store/*, admin/*, owner/*, Login.vue
   components/ ProductForm, ListingForm, ImageInput, Modal, Pagination, ...
@@ -275,6 +278,8 @@ tests/Feature/
 | `Vite manifest not found` | Run `npm install && npm run build`, or keep `npm run dev` running. |
 | `SQLSTATE[HY000] [2002]` / `[1049] Unknown database` | Start MySQL, create the database (step 4) and check the `DB_*` values in `.env`. |
 | `No application encryption key` | `php artisan key:generate` |
-| Thumbnails missing after a reset | Re-run the seeder: `php artisan migrate:fresh --seed` (this regenerates demo images). |
+| Thumbnails missing after a reset | Re-run the seeder: `php artisan migrate:fresh --seed` (this copies the demo photos again). |
 | Changed `.env` but nothing happens | `php artisan config:clear` |
 | Reset everything to the demo state | `php artisan migrate:fresh --seed` |
+| Thumbnails load slowly | Run `php artisan storage:link` so the web server sends them directly instead of going through Laravel. |
+| Pages load slowly with `php artisan serve` | PHP's built-in server answers one request at a time (and on Windows it can't run more workers). Enable OPcache in `php.ini` (`zend_extension=opcache` and `opcache.enable_cli=1`), or serve the `public/` folder with Apache/Nginx, e.g. a Laragon virtual host. |

@@ -3,6 +3,7 @@ import { reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { errorMessage, validationErrors } from '../lib/api';
 import { homeRouteFor, login } from '../lib/auth';
+import Icon from '../components/Icon.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -44,10 +45,12 @@ async function submit() {
 </script>
 
 <template>
-    <div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-violet-50 px-4 py-12">
+    <div class="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-12">
         <div class="w-full max-w-md">
             <RouterLink :to="{ name: 'home' }" class="mb-6 flex items-center justify-center gap-2 text-lg font-bold text-slate-900">
-                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-xl text-white">🛍️</span>
+                <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+                    <Icon name="bag" class="h-6 w-6" />
+                </span>
                 Small E-commerce
             </RouterLink>
 

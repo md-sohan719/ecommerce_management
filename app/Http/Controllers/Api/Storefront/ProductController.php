@@ -76,14 +76,8 @@ class ProductController extends Controller
 
     private function filter(Builder|HasMany $query, Request $request): Builder|HasMany
     {
-        $query->with(['product', 'shop'])->search($request->query('search'));
-
-        match ($request->query('sort')) {
-            'price_asc' => $query->orderBy('price')->orderBy('shop_products.id'),
-            'price_desc' => $query->orderByDesc('price')->orderBy('shop_products.id'),
-            default => $query->latest('shop_products.id'),
-        };
-
-        return $query;
+        return $query->with(['product', 'shop'])
+            ->search($request->query('search'))
+            ->sortBy($request->query('sort'));
     }
 }

@@ -76,7 +76,7 @@ async function remove(owner) {
                             <td class="td text-slate-600">{{ owner.email }}</td>
                             <td class="td">
                                 <div class="flex flex-wrap gap-1">
-                                    <span v-for="shop in owner.shops" :key="shop.id" class="badge bg-slate-100 text-slate-700">🏪 {{ shop.name }}</span>
+                                    <span v-for="shop in owner.shops" :key="shop.id" class="badge bg-slate-100 text-slate-700">{{ shop.name }}</span>
                                     <span v-if="!owner.shops?.length" class="text-xs text-slate-400">No shop assigned</span>
                                 </div>
                             </td>
