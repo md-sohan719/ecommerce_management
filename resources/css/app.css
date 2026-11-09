@@ -1,0 +1,55 @@
+@import 'tailwindcss';
+
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../**/*.vue';
+
+@theme {
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer components {
+    .btn {
+        @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+    .btn-primary {
+        @apply bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 focus-visible:ring-indigo-500;
+    }
+    .btn-secondary {
+        @apply border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-50 focus-visible:ring-slate-400;
+    }
+    .btn-danger {
+        @apply bg-rose-600 text-white shadow-sm hover:bg-rose-700 focus-visible:ring-rose-500;
+    }
+    .btn-ghost {
+        @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-400;
+    }
+    .btn-sm {
+        @apply px-2.5 py-1.5 text-xs;
+    }
+    .input {
+        @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none disabled:bg-slate-100;
+    }
+    .label {
+        @apply mb-1 block text-sm font-medium text-slate-700;
+    }
+    .hint {
+        @apply mt-1 text-xs text-slate-500;
+    }
+    .field-error {
+        @apply mt-1 text-xs text-rose-600;
+    }
+    .card {
+        @apply rounded-2xl border border-slate-200 bg-white shadow-sm;
+    }
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap;
+    }
+    .th {
+        @apply px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase;
+    }
+    .td {
+        @apply px-4 py-3 align-middle text-sm;
+    }
+}
